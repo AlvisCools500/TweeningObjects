@@ -55,6 +55,11 @@ class VectorInt2D {
     public void multiply(VectorInt2D other) {
         multiply(other.x, other.y);
     }
+
+    @Override
+    public String toString() {
+        return "x" + this.x + " y" + this.y;
+    }
 }
 
 class VectorDouble2D {
@@ -114,6 +119,11 @@ class VectorDouble2D {
     public void multiply(VectorDouble2D other) {
         multiply(other.x, other.y);
     }
+
+    @Override
+    public String toString() {
+        return "x" + this.x + " y" + this.y;
+    }
 }
 
 class UDim {
@@ -125,6 +135,10 @@ class UDim {
         offset = Offset;
     }
 
+    @Override
+    public String toString() {
+        return "sc" + this.scale + " of" + this.offset;
+    }
 }
 
 class UDim2 {
@@ -146,11 +160,12 @@ class UDim2 {
         int Height = MainCanvas.mainJFrame.getHeight();
 
 
-        VectorInt2D ResVect = new VectorInt2D(Width, Height);
-        ResVect.x = (int) ((ResVect.x * x.scale) + x.offset);
-        ResVect.y = (int) ((ResVect.y * x.scale) + y.offset);
+        VectorDouble2D ResVect = new VectorDouble2D(Width, Height);
 
-        return ResVect;
+        ResVect.x = (ResVect.x * this.x.scale);
+        ResVect.y = (ResVect.y * this.y.scale);
+
+        return new VectorInt2D((int) Math.round(ResVect.x), (int) Math.round(ResVect.y));
     }
 
     public VectorInt2D GetAbsoluteRatio(double ratio) {
@@ -168,6 +183,12 @@ class UDim2 {
         return new VectorInt2D(newWidth, newHeight);
     }
 
+    @Override
+    public String toString() {
+        String str = "xs" + x.scale + " xo" + x.offset + " ys" + y.scale + " yo" + y.offset;
+
+        return str;
+    }
 }
 
 public class VectorClass {

@@ -71,46 +71,7 @@ public class MainCanvas extends JPanel implements Runnable {
                     Frame inst = (Frame) v.Instance;
                     HashMap<IEnum.Properties, Object> properties = inst.properties;
 
-                    Color col = (Color) properties.get(IEnum.Properties.Color);
-                    int rot = (int) properties.get(IEnum.Properties.Rotation);
-                    UDim2 Size = (UDim2) properties.get(IEnum.Properties.Size);
-                    UDim2 Pos = (UDim2) properties.get(IEnum.Properties.Position);
-                    VectorDouble2D anchor = (VectorDouble2D) properties.get(IEnum.Properties.AnchorPoint);
-
-                    VectorInt2D resPos = Pos.GetAbsolute();
-                    VectorInt2D resSize;
-
-                    g.setColor(col);
-
-
-                    if (properties.get(IEnum.Properties.UIRatio) != null) {
-                        double ratio = (double) properties.get(IEnum.Properties.UIRatio);
-                        resSize = Size.GetAbsoluteRatio(ratio);
-                    }else {
-                        resSize = Size.GetAbsolute();
-                    }
-
-
-
-                    resPos.substract(new VectorInt2D((int) (resSize.x * anchor.x), (int) (resSize.y * anchor.y)));
-
-                    g.translate(resPos.x, resPos.y);
-
-                    g.rotate(Math.toRadians(rot));
-
-                    g.fillRect(0, 0, resSize.x, resSize.y);
-
-                    if (properties.get(IEnum.Properties.ShowPoint) != null) {
-                        boolean ShowPoint = (boolean) properties.get(IEnum.Properties.ShowPoint);
-
-                        if (ShowPoint) {
-                            g.setTransform(originalTransform);
-                            g.setColor(Color.BLACK);
-                            g.fillRect(Pos.GetAbsolute().x - (16/2), Pos.GetAbsolute().y - (16/2), 16, 16);
-                        }
-                    }
-
-
+                    inst.draw(g, originalTransform);
 
 
                 }
@@ -136,24 +97,22 @@ public class MainCanvas extends JPanel implements Runnable {
     }
 
     public void OnStart(Timer t) {
-        Frame myFrame1 = new Frame();
-        myFrame1.properties.put(IEnum.Properties.Size, new UDim2(0.25,0,0.25,0));
-        myFrame1.properties.put(IEnum.Properties.Position, new UDim2(0.75,0,0.5,0));
-        myFrame1.properties.put(IEnum.Properties.Color, new Color(109, 32, 225));
 
         Frame myFrame2 = new Frame();
-        myFrame2.properties.put(IEnum.Properties.Size, new UDim2(0.25,0,25,0));
-        myFrame2.properties.put(IEnum.Properties.Position, new UDim2(0.25,0,0.5,0));
-        myFrame2.properties.put(IEnum.Properties.Color, new Color(32, 202, 225));
-        myFrame2.properties.put(IEnum.Properties.UIRatio, (double) 1);
-        myFrame2.properties.put(IEnum.Properties.ShowPoint, true);
+        HashMap<IEnum.Properties, Object> myProp = myFrame2.properties;
+        //myFrame2.properties.put(IEnum.Properties.UIRatio, (double) 1);
+
+        instServ.setPosition(myProp, new UDim2(0.25,0,0,0));
+        instServ.setSize(myProp, new UDim2(0.25,0,.25,0));
+        instServ.setColor(myProp, new Color(32, 202, 225));
+
 
         System.out.println("added MyFrame");
 
         HashMap<IEnum.Properties, Object> targetProp = new HashMap<>();
         targetProp.put(IEnum.Properties.Position, new UDim2(0.25,0,1,0));
 
-        Tween tweens = new Tween(2, EasingService.EasingStyle.LINEAR, EasingService.EasingDirection.INOUT, myFrame2.properties, targetProp);
+        Tween tweens = new Tween(3, EasingService.EasingStyle.LINEAR, EasingService.EasingDirection.INOUT, myFrame2.myList, targetProp);
 
         tweens.play();
 

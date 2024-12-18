@@ -182,14 +182,13 @@ class Tween {
     float duration;
     private EasingService.EasingStyle easeStyle;
     private EasingService.EasingDirection easeDir;
-
-    private HashMap<IEnum.Properties, Object> propertyTable;
+    private ListInst targetinst;
     private HashMap<IEnum.Properties, Object> targetTable;
 
-    public Tween(float Time, EasingService.EasingStyle EaseStyle, EasingService.EasingDirection EaseDirection, HashMap<IEnum.Properties, Object> PropertyTable, HashMap<IEnum.Properties, Object> PropertyTarget) {
+    public Tween(float Time, EasingService.EasingStyle EaseStyle, EasingService.EasingDirection EaseDirection, ListInst targetinst, HashMap<IEnum.Properties, Object> PropertyTarget) {
         this.easeStyle = EaseStyle;
         this.easeDir = EaseDirection;
-        this.propertyTable = PropertyTable;
+        this.targetinst = targetinst;
         this.duration = Time;
         this.targetTable = PropertyTarget;
     }
@@ -206,11 +205,23 @@ class Tween {
         HashMap<IEnum.Properties, Object> propStart = new HashMap<>();
         HashMap<IEnum.Properties, Object> propEnd = targetTable;
 
+        HashMap<IEnum.Properties, Object> propertyTable;
+
+        if (targetinst.TypeInst == IEnum.IsA.Frame) {
+            Frame frame = (Frame) targetinst.Instance;
+
+            propertyTable = frame.properties;
+        }else {
+            Frame frame = (Frame) targetinst.Instance;
+
+            propertyTable = frame.properties;
+        }
+
         for (var v : propEnd.entrySet()) {
             IEnum.Properties index = v.getKey();
 
-            if (this.propertyTable.get(index) != null) {
-                propStart.put(index, this.propertyTable.get(index));
+            if (propertyTable.get(index) != null) {
+                propStart.put(index, propertyTable.get(index));
             }
         }
 
@@ -235,18 +246,14 @@ class Tween {
                     UDim2 targUDim2 = (UDim2) v.getValue();
                     UDim2 startUDim2 = (UDim2) propStart.get(index);
 
-                    System.out.println("Before " + startUDim2.y.scale);
-
-                    this.propertyTable.put(index, new UDim2(
+                    propertyTable.put(index, new UDim2(
                             basicAdds_Double(startUDim2.x.scale, targUDim2.x.scale, easedAlpha),
                             basicAdds_Int(startUDim2.x.offset, targUDim2.x.offset, easedAlpha),
                             basicAdds_Double(startUDim2.y.scale, targUDim2.y.scale, easedAlpha),
                             basicAdds_Int(startUDim2.y.offset, targUDim2.y.offset, easedAlpha)
                     ));
 
-                    UDim2 temp = (UDim2) this.propertyTable.get(index);
-
-                    System.out.println("After " + temp.y.scale);
+                    UDim2 temp = (UDim2) propertyTable.get(index);
                 }
             }
 
