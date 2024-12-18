@@ -1,5 +1,3 @@
-import java.rmi.server.UID;
-
 class VectorInt2D {
     int x;
     int y;
@@ -119,10 +117,10 @@ class VectorDouble2D {
 }
 
 class UDim {
-    float scale;
+    double scale;
     int offset;
 
-    public UDim(float Scale, int Offset) {
+    public UDim(double Scale, int Offset) {
         scale = Scale;
         offset = Offset;
     }
@@ -133,15 +131,43 @@ class UDim2 {
     UDim x;
     UDim y;
 
-    public UDim2(float ScaleX, int OffsetX, float ScaleY, int OffsetY) {
+    public UDim2(double ScaleX, int OffsetX, double ScaleY, int OffsetY) {
         x = new UDim(ScaleX, OffsetX);
-        y = new UDim(ScaleY, OffsetX);
+        y = new UDim(ScaleY, OffsetY);
     }
 
     public UDim2(UDim UX, UDim UY) {
         x = UX;
         y = UY;
     }
+
+    public VectorInt2D GetAbsolute() {
+        int Width = MainCanvas.mainJFrame.getWidth();
+        int Height = MainCanvas.mainJFrame.getHeight();
+
+
+        VectorInt2D ResVect = new VectorInt2D(Width, Height);
+        ResVect.x = (int) ((ResVect.x * x.scale) + x.offset);
+        ResVect.y = (int) ((ResVect.y * x.scale) + y.offset);
+
+        return ResVect;
+    }
+
+    public VectorInt2D GetAbsoluteRatio(double ratio) {
+        int Width = GetAbsolute().x;
+        int Height = GetAbsolute().y;
+
+        int newWidth = (int) (Height * ratio);
+        int newHeight = Height;
+
+        if (newWidth > Width) {
+            newWidth = Width;
+            newHeight = (int) (Width / ratio);
+        }
+
+        return new VectorInt2D(newWidth, newHeight);
+    }
+
 }
 
 public class VectorClass {
