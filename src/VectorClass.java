@@ -162,10 +162,10 @@ class UDim2 {
 
         VectorDouble2D ResVect = new VectorDouble2D(Width, Height);
 
-        ResVect.x = (ResVect.x * this.x.scale);
-        ResVect.y = (ResVect.y * this.y.scale);
+        ResVect.x = (ResVect.x * this.x.scale) + this.x.offset;
+        ResVect.y = (ResVect.y * this.y.scale) + this.y.offset;
 
-        return new VectorInt2D((int) Math.round(ResVect.x), (int) Math.round(ResVect.y));
+        return new VectorInt2D((int) ResVect.x, (int) ResVect.y);
     }
 
     public VectorInt2D GetAbsoluteRatio(double ratio) {

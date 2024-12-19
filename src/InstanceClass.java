@@ -1,3 +1,5 @@
+import com.sun.tools.javac.Main;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.HashMap;
@@ -15,15 +17,16 @@ class Frame {
 
     public void draw(Graphics2D g, AffineTransform originTransform) {
         Color col = (Color) this.properties.get(IEnum.Properties.Color);
-        int rot = (int) this.properties.get(IEnum.Properties.Rotation);
+        double rot = (double) this.properties.get(IEnum.Properties.Rotation);
         UDim2 Size = (UDim2) this.properties.get(IEnum.Properties.Size);
         UDim2 Pos = (UDim2) this.properties.get(IEnum.Properties.Position);
         VectorDouble2D anchor = (VectorDouble2D) this.properties.get(IEnum.Properties.AnchorPoint);
+        double transparency = (double) this.properties.get(IEnum.Properties.Transparency);
 
         VectorInt2D resPos = Pos.GetAbsolute();
         VectorInt2D resSize;
 
-        g.setColor(col);
+        g.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), (int) (255 * transparency)));
 
         if (this.properties.get(IEnum.Properties.UIRatio) != null) {
             double ratio = (double) this.properties.get(IEnum.Properties.UIRatio);
@@ -32,11 +35,17 @@ class Frame {
             resSize = Size.GetAbsolute();
         }
 
-        resPos.substract(new VectorInt2D((int) (resSize.x * anchor.x), (int) (resSize.y * anchor.y)));
+        g.setTransform(originTransform);
 
-        g.translate(resPos.x, resPos.y);
+        VectorInt2D resAnchorPos = new VectorInt2D(
+                (int) (resSize.x * anchor.x),
+                (int) (resSize.y * anchor.y));
 
-        g.rotate(Math.toRadians(rot));
+        resPos.substract(resAnchorPos);
+        //resPos.substract(new VectorInt2D((resSize.x/2),(resSize.y/2)));
+        g.translate(resPos.x + MainCanvas.CenterX,resPos.y + MainCanvas.CenterY);
+
+        g.rotate(Math.toRadians(rot), resAnchorPos.x, resAnchorPos.y);
 
         g.fillRect(0, 0, resSize.x, resSize.y);
 
@@ -44,9 +53,11 @@ class Frame {
             boolean ShowPoint = (boolean) this.properties.get(IEnum.Properties.ShowPoint);
 
             if (ShowPoint) {
-                g.setTransform(originTransform);
+                g.setTransform(originTransform);;
+                g.translate(Pos.GetAbsolute().x + MainCanvas.CenterX, Pos.GetAbsolute().y + MainCanvas.CenterY);
+
                 g.setColor(Color.BLACK);
-                g.fillRect(Pos.GetAbsolute().x - (16/2), Pos.GetAbsolute().y - (16/2), 16, 16);
+                g.fillRect(-4, -4, 8, 8);
             }
         }
 
@@ -82,7 +93,7 @@ class instServ {
         props.put(IEnum.Properties.Position, value);
     }
 
-    public static void setRotation(HashMap<IEnum.Properties, Object> props, Integer value) {
+    public static void setRotation(HashMap<IEnum.Properties, Object> props, double value) {
         props.put(IEnum.Properties.Rotation, value);
     }
 
@@ -95,7 +106,7 @@ class instServ {
     }
 
     public static void setTransparency(HashMap<IEnum.Properties, Object> props, double value) {
-        props.put(IEnum.Properties.Transparency, value);
+        props.put(IEnum.Properties.Transparency, (double) value);
     }
 
     public static void setColor(HashMap<IEnum.Properties, Object> props, Color value) {
@@ -113,8 +124,8 @@ public class InstanceClass {
         props.put(IEnum.Properties.Size, new UDim2(0, 100, 0, 100));
         props.put(IEnum.Properties.ZIndex, (int) 0);
         props.put(IEnum.Properties.Color, new Color(255,255,255));
-        props.put(IEnum.Properties.Transparency, 0);
-        props.put(IEnum.Properties.Rotation, 0);
+        props.put(IEnum.Properties.Transparency, (double) 1);
+        props.put(IEnum.Properties.Rotation, (double) 0);
         props.put(IEnum.Properties.AnchorPoint, new VectorDouble2D(0.5,0.5));
         props.put(IEnum.Properties.UICorner, new UDim(0,0));
     }
