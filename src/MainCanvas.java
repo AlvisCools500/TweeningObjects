@@ -8,6 +8,7 @@ import java.util.*;
 class ListInst {
     IEnum.IsA TypeInst;
     Object Instance;
+    UUID uuid = UUID.randomUUID();
 
     public ListInst(IEnum.IsA typeInst, Object inst) {
         this.TypeInst = typeInst;
@@ -17,7 +18,7 @@ class ListInst {
 
 public class MainCanvas extends JPanel implements Runnable {
 
-    public static ArrayList<ListInst> objectList = new ArrayList<>();
+    public static World world = new World();
     public static JFrame mainJFrame;
 
     public static VectorInt2D Resolution = new VectorInt2D(mainMod.Resolution.x, mainMod.Resolution.y);
@@ -43,10 +44,12 @@ public class MainCanvas extends JPanel implements Runnable {
 
         AffineTransform originalTransform = g.getTransform();
 
+        HashMap<UUID, ListInst> objectList = world.GetInstances();
+
 
         // Prepare ZIndexes
-        for (int i = objectList.size() - 1; i>=0; i--) {
-            ListInst v = objectList.get(i);
+        for (var a : objectList.entrySet()) {
+            ListInst v = a.getValue();
 
             int ZIndex = 0;
 
@@ -104,49 +107,11 @@ public class MainCanvas extends JPanel implements Runnable {
 
 
         task.spawn(() -> AnimFraming1());
-        task.spawn(() -> AnimFraming2());
+
 
         System.out.println("YAY ITS ENDING!");
 
 
-    }
-
-    public void AnimFraming2() {
-        UDim2 CurrPos = new UDim2(0,0,0.1,0);
-
-        task.Wait(1);
-
-        for (var v : EasingService.EasingStyle.values()) {
-            Frame newFrame = new Frame();
-            HashMap<IEnum.Properties, Object> prop = newFrame.properties;
-            HashMap<IEnum.Properties, Object> targ = new HashMap<>();
-
-            CurrPos = new UDim2(CurrPos.x.scale, CurrPos.x.offset + 50, CurrPos.y.scale, CurrPos.y.offset);
-
-            instServ.setPosition(prop,CurrPos);
-            instServ.setSize(prop, new UDim2(0, 25, 0, 25));
-
-            instServ.setPosition(targ, new UDim2(CurrPos.x.scale, CurrPos.x.offset, 0.9, CurrPos.y.offset));
-
-            Color myCol = new Color(255,255, 255);
-
-            switch (v) {
-                case LINEAR -> {myCol = new Color(255, 108, 108);}
-                case EXPONENTIAL -> {myCol = new Color(255, 0, 195);}
-                case ELASTIC -> {myCol = new Color(8, 0, 255);}
-                case BACK -> {myCol = new Color(0, 255, 140);}
-                case BOUNCE -> {myCol = new Color(221, 255, 0);}
-                case CUBIC -> {myCol = new Color(255, 106, 0);}
-                case SINE -> {myCol = new Color(0, 255, 226);}
-                case QUAD -> {myCol = new Color(0, 255, 116);}
-            }
-
-            instServ.setColor(prop, myCol);
-
-            Tween tween = new Tween(5, v, EasingService.EasingDirection.INOUT, newFrame.myList, targ);
-            tween.play();
-
-        }
     }
 
     public void AnimFraming1() {

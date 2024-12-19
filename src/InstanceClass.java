@@ -2,17 +2,63 @@ import com.sun.tools.javac.Main;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
-class Frame {
+class Instance {
+    HashMap<UUID, ListInst> listObj = new HashMap<>();
+    ListInst Parent;
+    ListInst myList = new ListInst(IEnum.IsA.Frame, this);
+
+    public Instance() {
+        this.setParent(MainCanvas.world.getListInst());
+    }
+
+    public HashMap<UUID, ListInst> GetInstances() {
+        return listObj;
+    }
+
+    public ListInst getListInst() {
+        return myList;
+    }
+
+    public void setParent(ListInst target) {
+
+        if (this.Parent != null) {
+            ListInst previousInst = (ListInst) this.Parent;
+            Instance inst = (Instance) previousInst.Instance;
+
+            inst.removeInstance(myList);
+
+        }
+
+        if (target != null) {
+            ListInst targetInst = (ListInst) target;
+
+            Instance inst = (Instance) targetInst.Instance;
+
+            inst.listObj.put(myList.uuid,myList);
+        }else {
+            Parent = null;
+        }
+    }
+
+
+    public void removeInstance(ListInst target) {
+        Instance inst = (Instance) target.Instance;
+        
+    }
+}
+
+class World extends Instance {}
+
+class Frame extends Instance {
     HashMap<IEnum.Properties, Object> properties = new HashMap<>();
-    ListInst myList;
+
 
     public Frame() {
         InstanceClass.AddDefaults(properties);
-        myList = new ListInst(IEnum.IsA.Frame, this);
-        MainCanvas.objectList.add(myList);
-
     }
 
     public void draw(Graphics2D g, AffineTransform originTransform) {
@@ -62,6 +108,7 @@ class Frame {
         }
 
     }
+
 }
 
 class IEnum {
